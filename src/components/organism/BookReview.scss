@@ -1,0 +1,45 @@
+@charset "utf-8";
+
+.card {
+  margin: 20px;
+  width: 800px;
+  height: 200px;
+  border-width: 1px;
+  padding: 12px;
+  &__h2 {
+    font-family: "メイリオ", "Meiryo", sans-serif;
+    margin-bottom: 12px;
+    &--size_l {
+      font-size: 1.125rem /* 18px */;
+      line-height: 1.75rem /* 28px */;
+      font-weight: 600;
+    }
+    &--link:hover {
+      --tw-text-opacity: 1;
+      color: rgb(96 165 250 / var(--tw-text-opacity));
+      text-decoration-line: underline;
+    }
+  }
+  &__p {
+    margin-bottom: 8px;
+    word-wrap: break-word;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    &--size_m {
+      font-size: 1rem /* 16px */;
+      line-height: 1.5rem /* 24px */;
+    }
+  }
+  &__a {
+    &--size_s {
+      font-size: 0.875rem /* 14px */;
+      line-height: 1.25rem /* 20px */;
+    }
+    &--link {
+      --tw-text-opacity: 1;
+      color: rgb(96 165 250 / var(--tw-text-opacity));
+      text-decoration-line: underline;
+    }
+  }
+}

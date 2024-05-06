@@ -18,9 +18,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["react","cypress", "@emotion/react/types/css-prop"],
   },
   "include": [
-    "src"
+    "src",
+    "cypress/e2e"
   ]
 }
