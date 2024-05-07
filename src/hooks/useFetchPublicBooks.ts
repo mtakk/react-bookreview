@@ -3,18 +3,15 @@ import { axios } from "../api/axios";
 import { BookReviewType } from "../types/bookReviewType";
 import { ApiError } from "../types/apiError";
 
-export const useFetchBooks = () => {
-  const getBooks = useCallback(async (offset: number) => {
-    const token = sessionStorage.getItem("bookreview_token");
-    const headers = { Authorization: `Bearer ${token}` };
+export const useFetchPublicBooks = () => {
+  const getPublicBooks = useCallback(async (offset: number) => {
     const params = { offset: String(offset) };
     return axios
-      .get<Array<BookReviewType>>("/books", {
-        params,
-        headers,
+      .get<Array<BookReviewType>>("/public/books", {
+        params
       })
       .then((res) => {
-        console.log("getBooks成功");
+        console.log("getPublicBooks成功");
         return res.data;
       })
       .catch((res) => {
@@ -23,5 +20,5 @@ export const useFetchBooks = () => {
       })
       .finally(() => console.log("処理終了"));
   }, []);
-  return { getBooks };
+  return { getPublicBooks };
 };

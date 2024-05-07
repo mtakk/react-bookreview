@@ -8,21 +8,37 @@ import "./Home.scss";
 import { Pagination } from "../organism/Pagination";
 import { useFetchBook } from "../../hooks/useFetchBook";
 import { useBookLog } from "../../hooks/useBookLog";
+import { useFetchPublicBooks } from "../../hooks/useFetchPublicBooks";
+import { showModalApiErrorMessage } from "../../function/showModalApiErrorMessage";
+import { ApiError } from "../../types/apiError";
 
 export const Home: FC = () => {
   const [bookReviews, setBookReviews] = useState<Array<BookReviewType>>([]);
   const { getBooks } = useFetchBooks();
+  const { getPublicBooks } = useFetchPublicBooks();
   const { getBook } = useFetchBook();
   const { postBookLog } = useBookLog();
   const pageNumber = useSelector((state: RootState) => state.pageNumber.value);
+  const token = sessionStorage.getItem("bookreview_token");
 
   useEffect(() => {
     const fetchData = async () => {
-      const result = (await getBooks(pageNumber * 10)) ?? [];
-      setBookReviews(result);
+      if (token) {
+        const result = (await getBooks(pageNumber * 10)) ?? [];
+        setBookReviews(result);
+      } else {
+        const result = (await getPublicBooks(pageNumber * 10)) ?? [];
+        setBookReviews(result);
+      }
     };
-    fetchData();
-  }, [getBooks, pageNumber]);
+
+    try {
+      fetchData();
+    } catch (e) {
+      const error = e as ApiError;
+      showModalApiErrorMessage(error);
+    }
+  }, [getBooks, getPublicBooks, token, pageNumber]);
 
   return (
     <div className="home-container">
@@ -34,7 +50,7 @@ export const Home: FC = () => {
           url={bookReview.url}
           review={bookReview.review}
           reviewer={bookReview.reviewer}
-          getBook={getBook}
+          getBook={getBook} // これで渡すのは意味ない？何度も関数生成するのを防ぐ意図だったけど
           postBookLog={postBookLog}
         />
       ))}

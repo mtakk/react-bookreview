@@ -3,8 +3,6 @@ import { showModalMessage } from "../function/showModalMessage";
 import { axios } from "../api/axios";
 import { BookType } from "../types/bookType";
 
-
-
 export const usePutBook = () => {
   const putBook = useCallback(async (props: BookType & {id: string}) => {
     const token = sessionStorage.getItem("bookreview_token");

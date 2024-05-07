@@ -3,6 +3,8 @@ import { User } from "../../types/user";
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "../../hooks/useLogin";
 import { useFetchUser } from "../../hooks/useFetchUser";
+import { ApiError } from "../../types/apiError";
+import { showModalApiErrorMessage } from "../../function/showModalApiErrorMessage";
 
 export const Login = () => {
   const navigate = useNavigate();
@@ -14,11 +16,15 @@ export const Login = () => {
     formState: { errors },
   } = useForm<Omit<User, "name">>();
 
-
   const onSubmitSignUp: SubmitHandler<Omit<User, "name">> = async (data) => {
-    const token = await postSignin(data);
-    await fetchUser(token);
-    navigate("/");
+    try {
+      const token = await postSignin(data);
+      await fetchUser(token);
+      navigate("/");
+    } catch (e) {
+      const error = e as ApiError;
+      showModalApiErrorMessage(error);
+    }
   };
   const onClickToSignUp = () => navigate("/signup");
 

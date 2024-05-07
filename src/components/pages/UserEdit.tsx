@@ -1,9 +1,11 @@
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { useUpdateUser } from "../../hooks/useUpdateUser";
+import { ApiError } from "../../types/apiError";
+import { showModalApiErrorMessage } from "../../function/showModalApiErrorMessage";
 
 
 export const UserEdit:FC = () => {
@@ -22,8 +24,13 @@ export const UserEdit:FC = () => {
   },[name])
 
   const onSubmitUpdateUser: SubmitHandler<{name: string}> = async (data) => {
-    await putUsers(data.name);
-    navigate("/");
+    try {
+      await putUsers(data.name);
+      navigate("/");
+    } catch (e) {
+      const error = e as ApiError;
+      showModalApiErrorMessage(error);
+    }
   };
 
   return (

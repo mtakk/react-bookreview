@@ -1,10 +1,12 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { axios } from "../api/axios";
-import { showModalMessage } from "../function/showModalMessage";
 import { BookReviewMineType } from "../types/bookReviewMineType";
+import { ApiError } from "../types/apiError";
 
 export const useFetchBook = () => {
+  const [loading, setLoading] = useState(false);
   const getBook = useCallback(async (id: string) => {
+    setLoading(true);
     const token = sessionStorage.getItem("bookreview_token");
     const headers = { Authorization: `Bearer ${token}` };
     return axios
@@ -17,9 +19,13 @@ export const useFetchBook = () => {
         return res.data;
       })
       .catch((res) => {
-        showModalMessage("書籍情報の取得に失敗しました。");
+        const error = res?.response?.data as ApiError;
+        throw error;
       })
-      .finally(() => console.log("処理終了"));
+      .finally(() => {
+        console.log("処理終了");
+        setLoading(false);
+      });
   }, []);
-  return { getBook };
+  return { getBook, loading, setLoading };
 };

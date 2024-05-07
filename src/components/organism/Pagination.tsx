@@ -11,12 +11,10 @@ export const Pagination: FC<Props> = memo((props) => {
   const { pageNumber } = props;
   const dispatch = useDispatch();
   const onclickPageBack = () => {
-    const nextNumber = pageNumber - 1;
-    dispatch(setPageNumber(nextNumber));
+    dispatch(setPageNumber(pageNumber - 1));
   };
   const onclickPageForward = () => {
-    const nextNumber = pageNumber + 1;
-    dispatch(setPageNumber(nextNumber));
+    dispatch(setPageNumber(pageNumber + 1));
   };
 
   return (

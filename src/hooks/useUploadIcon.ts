@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { axios } from "../api/axios";
 import { UploadIcon } from "../types/uploadIcon";
-import { showModalMessage } from "../function/showModalMessage";
+import { ApiError } from "../types/apiError";
 
 export const useUploadIcon = () => {
   const postUploads = useCallback(async (props: UploadIcon) => {
@@ -16,10 +16,10 @@ export const useUploadIcon = () => {
         console.log(res);
       })
       .catch((res) => {
-        console.log("登録に失敗しました。" + res);
-        showModalMessage("アップロードに失敗しました。");
+        const error = res?.response?.data as ApiError;
+        throw error;
       })
-      .finally(() => console.log("登録終了"));
+      .finally(() => console.log("処理終了"));
   }, []);
   return { postUploads };
 };

@@ -1,7 +1,9 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { BookType } from "../../types/bookType";
+import { useEffect, useState } from "react";
 
 export const BookDetail = () => {
+  const [loading, setLoading] = useState<boolean>(true);
   const navigate = useNavigate();
   const onClickToTop = () => navigate("/");
   const location = useLocation();
@@ -9,37 +11,49 @@ export const BookDetail = () => {
   const book: BookType = location.state;
   const { title, url, detail, review } = book;
 
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 1000);
+  }, [loading]);
+
   return (
     <main className=" flex justify-center">
       <div className=" w-4/5">
         <h1 className="text-xl font-bold max-w-full mt-8 flex items-center">
           書籍レビュー
         </h1>
-        <div className=" w-full flex flex-wrap">
-          <h2 id="title" className="w-full px-2 py-4 mt-4">
-            {title}
-          </h2>
-          <p id="url" className=" w-full px-2 py-4 mt-4">
-            URL
-            <br />
-            <a
-              href={url}
-              className=" w-full inline-block truncate break-words text-blue-400 underline"
-            >
-              {url}
-            </a>
-          </p>
-          <p id="detail" className="w-full px-2 py-4 mt-4 h-auto">
-            詳細:
-            <br />
-            {detail}
-          </p>
-          <p id="review" className="w-full px-2 py-4 mt-4 h-auto">
-            レビュー:
-            <br />
-            {review}
-          </p>
-        </div>
+
+        {loading ? (
+          <div className="flex justify-center" aria-label="読み込み中">
+            <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent"></div>
+          </div>
+        ) : (
+          <div className=" w-full flex flex-wrap">
+            <h2 id="title" className="w-full px-2 py-4 mt-4">
+              {title}
+            </h2>
+            <p id="url" className=" w-full px-2 py-4 mt-4">
+              URL
+              <br />
+              <a
+                href={url}
+                className=" w-full inline-block truncate break-words text-blue-400 underline"
+              >
+                {url}
+              </a>
+            </p>
+            <p id="detail" className="w-full px-2 py-4 mt-4 h-auto">
+              詳細:
+              <br />
+              {detail}
+            </p>
+            <p id="review" className="w-full px-2 py-4 mt-4 h-auto">
+              レビュー:
+              <br />
+              {review}
+            </p>
+          </div>
+        )}
+
         <div className="text-center">
           <p
             className=" text-blue-600 underline m-2 text-xs"

@@ -6,6 +6,8 @@ import { ChangeEvent, useState } from "react";
 import { useUploadIcon } from "../../hooks/useUploadIcon";
 import Compressor from "compressorjs";
 import { useLogin } from "../../hooks/useLogin";
+import { showModalApiErrorMessage } from "../../function/showModalApiErrorMessage";
+import { ApiError } from "../../types/apiError";
 
 export const SignUp = () => {
   const navigate = useNavigate();
@@ -20,16 +22,20 @@ export const SignUp = () => {
   const [icon, setIcon] = useState<File>();
 
   const onSubmitSignUp: SubmitHandler<User> = async (data) => {
-    const token = await postUsers(data);
-    icon && (await postUploads({ authorization: token, icon: icon }));
-    await postSignin(data);
-    navigate("/");
+    try {
+      const token = await postUsers(data);
+      icon && (await postUploads({ authorization: token, icon: icon }));
+      await postSignin(data);
+      navigate("/");
+    } catch (e) {
+      const error = e as ApiError;
+      showModalApiErrorMessage(error);
+    }
   };
   const onConClickToLogin = () => navigate("/login");
 
   const onChangeIcon = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    console.log(file?.size);
     file &&
       new Compressor(file, {
         quality: 0.6,
@@ -39,6 +45,7 @@ export const SignUp = () => {
           const compressedFile = new File([result], file.name, {
             type: file.type,
           });
+          console.log("圧縮後何メガバイトか？" + (compressedFile.size / (1024*1024)))
           setIcon(compressedFile);
         },
       });

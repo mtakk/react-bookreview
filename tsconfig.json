@@ -19,10 +19,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["react","cypress", "@emotion/react/types/css-prop"],
+    "types": ["react","cypress", "@emotion/react/types/css-prop", "@testing-library/jest-dom"],
   },
   "include": [
     "src",
-    "cypress/e2e"
+    "cypress/e2e",
+    "jest.setup.js"
   ]
 }

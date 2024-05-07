@@ -1,24 +1,26 @@
 import { useCallback } from "react";
 import { User } from "../types/user";
-import { showModalMessage } from "../function/showModalMessage";
 import { axios } from "../api/axios";
+import { ApiError } from "../types/apiError";
+import { useDispatch } from "react-redux";
+import { setToken } from "../redux/tokenSlice";
 
 export const useLogin = () => {
+  const dispatch = useDispatch();
   const postSignin = useCallback(async (props: Omit<User, "name">) => {
     return axios
       .post("/signin", props)
       .then((res) => {
-        console.log("ログイン成功");
-        console.log(res);
-        sessionStorage.setItem('bookreview_token', res.data.token);
+        sessionStorage.setItem("bookreview_token", res.data.token);
+        dispatch(setToken(res.data.token));
         return res.data.token;
       })
       .catch((res) => {
-        console.log("ログインに失敗しました。" + res);
-        sessionStorage.removeItem('bookreview_token');
-        showModalMessage("ログインに失敗しました。");
+        sessionStorage.removeItem("bookreview_token");
+        const error = res?.response?.data as ApiError;
+        throw error;
       })
-      .finally(() => console.log("処理終了"));
+      .finally(() => console.log("ログイン終了"));
   }, []);
   return { postSignin };
 };

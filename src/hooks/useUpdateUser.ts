@@ -1,8 +1,8 @@
 import { useCallback } from "react";
-import { showModalMessage } from "../function/showModalMessage";
 import { axios } from "../api/axios";
 import { setName } from "../redux/nameSlice";
 import { useDispatch } from "react-redux";
+import { ApiError } from "../types/apiError";
 
 export const useUpdateUser = () => {
   const dispatch = useDispatch();
@@ -18,8 +18,8 @@ export const useUpdateUser = () => {
           dispatch(setName(res.data.name));
         })
         .catch((res) => {
-          console.log("アカウント名の変更に失敗しました。" + res);
-          showModalMessage("アカウント名の変更に失敗しました。");
+          const error = res?.response?.data as ApiError;
+          throw error;
         })
         .finally(() => console.log("処理終了"));
     },

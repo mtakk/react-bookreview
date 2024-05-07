@@ -5,12 +5,20 @@ import { useEffect, useState } from "react";
 import { usePutBook } from "../../hooks/usePutBook";
 import { useFetchBook } from "../../hooks/useFetchBook";
 import { BookReviewMineType } from "../../types/bookReviewMineType";
+import { useDeleteBook } from "../../hooks/useDeleteBook";
 
 export const BookEdit = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const bookId = useParams().id as string;
   const { putBook } = usePutBook();
-  const { getBook } = useFetchBook();
+  const { getBook, loading } = useFetchBook();
+  const { deleteBook } = useDeleteBook();
+
+  const onClickToTop = () => navigate("/");
+
+  // フォーム
+  const [newBook, setNewBook] = useState<BookType>();
   const {
     register,
     handleSubmit,
@@ -18,9 +26,6 @@ export const BookEdit = () => {
     trigger,
     reset,
   } = useForm<BookType>();
-
-  const location = useLocation();
-  const [newBook, setNewBook] = useState<BookType>();
 
   useEffect(() => {
     if (!newBook) setNewBook(location.state);
@@ -33,13 +38,19 @@ export const BookEdit = () => {
     trigger();
   }, [newBook, location.state, reset, trigger]);
 
+  // 更新
   const onSubmitPutBook: SubmitHandler<BookType> = async (data) => {
     if (bookId) await putBook({ id: bookId, ...data });
     const updatedBook = (await getBook(bookId)) ?? ({} as BookReviewMineType);
     const { title, url, detail, review } = updatedBook;
     setNewBook({ title, url, detail, review });
   };
-  const onClickToTop = () => navigate("/");
+
+  // 削除
+  const onClickDelete = async () => {
+    await deleteBook(bookId);
+    navigate("/");
+  };
 
   return (
     <main className=" flex justify-center">
@@ -47,87 +58,98 @@ export const BookEdit = () => {
         <h1 className="text-xl font-bold max-w-full mt-8 flex items-center">
           書籍レビュー投稿
         </h1>
-        <form
-          onSubmit={handleSubmit(onSubmitPutBook)}
-          className=" w-full flex flex-wrap"
-        >
-          <input
-            id="title"
-            type="text"
-            placeholder="タイトル"
-            className="w-full px-2 py-4 mt-4 rounded-md border"
-            {...register("title", {
-              required: "必須入力です",
-            })}
-          />
-          <p className=" text-red-500 text-xs h-4">
-            {errors.title?.message}&nbsp;
-          </p>
-          <input
-            id="url"
-            type="text"
-            placeholder="URL"
-            className="w-full px-2 py-4 mt-4 rounded-md border"
-            {...register("url", {
-              required: "必須入力です",
-            })}
-          />
-          <p className=" text-red-500 text-xs h-4">
-            {errors.url?.message}&nbsp;
-          </p>
-          <textarea
-            id="detail"
-            placeholder="説明"
-            wrap="soft"
-            className="w-full px-2 py-4 mt-4 rounded-md border h-32"
-            {...register("detail", {
-              required: "必須入力です",
-              minLength: {
-                value: 10,
-                message: "10文字以上で入力してください",
-              },
-              maxLength: {
-                value: 50,
-                message: "50文字以下で入力してください",
-              },
-            })}
-          />
-          <p className=" text-red-500 text-xs h-4">
-            {errors.detail?.message}&nbsp;
-          </p>
-          <textarea
-            id="review"
-            placeholder="レビュー"
-            wrap="soft"
-            className="w-full px-2 py-4 mt-4 rounded-md border h-32"
-            {...register("review", {
-              required: "必須入力です",
-              minLength: {
-                value: 10,
-                message: "10文字以上で入力してください",
-              },
-              maxLength: {
-                value: 50,
-                message: "50文字以下で入力してください",
-              },
-            })}
-          />
-          <p className=" text-red-500 text-xs h-4">
-            {errors.review?.message}&nbsp;
-          </p>
-          <button
-            type="submit"
-            className="px-8 py-2 w-full mb-4 mt-6 text-white bg-green-500 rounded-md"
-          >
-            更新する
-          </button>
-        </form>
-        <button
-          type="submit"
-          className="px-8 py-2 w-full mb-4 mt-4 text-white bg-red-500 rounded-md"
-        >
-          削除する
-        </button>
+
+        {loading ? (
+          <div className="flex justify-center" aria-label="読み込み中">
+            <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent"></div>
+          </div>
+        ) : (
+          <>
+            <form
+              onSubmit={handleSubmit(onSubmitPutBook)}
+              className=" w-full flex flex-wrap"
+            >
+              <input
+                id="title"
+                type="text"
+                placeholder="タイトル"
+                className="w-full px-2 py-4 mt-4 rounded-md border"
+                {...register("title", {
+                  required: "必須入力です",
+                })}
+              />
+              <p className=" text-red-500 text-xs h-4">
+                {errors.title?.message}&nbsp;
+              </p>
+              <input
+                id="url"
+                type="text"
+                placeholder="URL"
+                className="w-full px-2 py-4 mt-4 rounded-md border"
+                {...register("url", {
+                  required: "必須入力です",
+                })}
+              />
+              <p className=" text-red-500 text-xs h-4">
+                {errors.url?.message}&nbsp;
+              </p>
+              <textarea
+                id="detail"
+                placeholder="説明"
+                wrap="soft"
+                className="w-full px-2 py-4 mt-4 rounded-md border h-32"
+                {...register("detail", {
+                  required: "必須入力です",
+                  minLength: {
+                    value: 10,
+                    message: "10文字以上で入力してください",
+                  },
+                  maxLength: {
+                    value: 50,
+                    message: "50文字以下で入力してください",
+                  },
+                })}
+              />
+              <p className=" text-red-500 text-xs h-4">
+                {errors.detail?.message}&nbsp;
+              </p>
+              <textarea
+                id="review"
+                placeholder="レビュー"
+                wrap="soft"
+                className="w-full px-2 py-4 mt-4 rounded-md border h-32"
+                {...register("review", {
+                  required: "必須入力です",
+                  minLength: {
+                    value: 10,
+                    message: "10文字以上で入力してください",
+                  },
+                  maxLength: {
+                    value: 50,
+                    message: "50文字以下で入力してください",
+                  },
+                })}
+              />
+              <p className=" text-red-500 text-xs h-4">
+                {errors.review?.message}&nbsp;
+              </p>
+              <button
+                type="submit"
+                className="px-8 py-2 w-full mb-4 mt-6 text-white bg-green-500 rounded-md"
+              >
+                更新する
+              </button>
+            </form>
+            <button
+              type="submit"
+              className="px-8 py-2 w-full mb-4 mt-4 text-white bg-red-500 rounded-md"
+              onClick={onClickDelete}
+            >
+              削除する
+            </button>
+          </>
+        )}
+
         <div className="text-center">
           <p
             className=" text-blue-600 underline m-2 text-xs"
@@ -141,31 +163,26 @@ export const BookEdit = () => {
   );
 };
 
-
-
-
-
-    // if (newBook) {
-    // const title: HTMLInputElement | null = document.getElementById(
-    //   "title"
-    // ) as HTMLInputElement;
-    // title.value = newBook.title ?? "";
-    // const url: HTMLInputElement | null = document.getElementById(
-    //   "url"
-    // ) as HTMLInputElement;
-    // url.value = newBook.url ?? "";
-    // const detail: HTMLTextAreaElement | null = document.getElementById(
-    //   "detail"
-    // ) as HTMLTextAreaElement;
-    // detail.value = newBook.detail ?? "";
-    // const review: HTMLTextAreaElement | null = document.getElementById(
-    //   "review"
-    // ) as HTMLTextAreaElement;
-    // review.value = newBook.review ?? "";
-    // } else {
-    //   setNewBook(location.state);
-    // }
-
+// if (newBook) {
+// const title: HTMLInputElement | null = document.getElementById(
+//   "title"
+// ) as HTMLInputElement;
+// title.value = newBook.title ?? "";
+// const url: HTMLInputElement | null = document.getElementById(
+//   "url"
+// ) as HTMLInputElement;
+// url.value = newBook.url ?? "";
+// const detail: HTMLTextAreaElement | null = document.getElementById(
+//   "detail"
+// ) as HTMLTextAreaElement;
+// detail.value = newBook.detail ?? "";
+// const review: HTMLTextAreaElement | null = document.getElementById(
+//   "review"
+// ) as HTMLTextAreaElement;
+// review.value = newBook.review ?? "";
+// } else {
+//   setNewBook(location.state);
+// }
 
 //const params = useParams();
 // const [book, setBook]
